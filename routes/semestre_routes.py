@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from controllers.semestre_controller import *
 from models.semestre_model import Semestre
+from validations.semestre_validation import validate
 
 router = APIRouter()
 
@@ -9,6 +10,9 @@ nuevo_semestre = SemestreController()
 
 @router.post("/create_semestre")
 async def create_semestre(semestre: Semestre):
+    validation = validate(semestre)
+    if "error" in validation:
+        raise HTTPException(status_code=400, detail=validation["error"])
     rpta = nuevo_semestre.create_semestre(semestre)
     return rpta
 

@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from controllers.docente_controller import *
 from models.docente_model import Docente
+from validations.docente_validation import validate
 
 router = APIRouter()
 
@@ -9,6 +10,9 @@ nuevo_docente = DocenteController()
 
 @router.post("/create_docente")
 async def create_docente(docente: Docente):
+    validation = validate(docente)
+    if "error" in validation:
+        raise HTTPException(status_code=400, detail=validation["error"])
     rpta = nuevo_docente.create_docente(docente)
     return rpta
 
