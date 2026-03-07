@@ -6,7 +6,8 @@ from fastapi.encoders import jsonable_encoder
     
 class DocenteController:
         
-    def create_docente(self, docente: Docente):   
+    def create_docente(self, docente: Docente): 
+        conn = None  
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
@@ -18,10 +19,12 @@ class DocenteController:
             print(err)
             # Si falla el INSERT, los datos no quedan guardados parcialmente en la base de datos
             # Se usa para deshacer los cambios de la transacción activa cuando ocurre un error en el try.
-            conn.rollback()
+            if conn:
+                conn.rollback()
             raise HTTPException(status_code=500, detail="Error al crear docente")
         finally:
-            conn.close()
+            if conn:
+                conn.close()
         
 
     def get_docente(self, docente_id: int):
