@@ -1,11 +1,11 @@
 import re
 from datetime import datetime
-from models.semestre_model import Semestre
+from models.periodo_model import Periodo
 
-def validate(data: Semestre):
+def validate(data: Periodo):
     # Validar nombre no vacío
     if not data.nombre.strip():
-        return {"error": "Nombre del semestre es requerido"}
+        return {"error": "Nombre del periodo es requerido"}
 
     # Validar formato de fecha (YYYY-MM-DD)
     fecha_regex = r'^\d{4}-\d{2}-\d{2}$'

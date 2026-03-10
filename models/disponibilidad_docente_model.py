@@ -4,7 +4,9 @@ class DisponibilidadDocente(BaseModel):
     id:int=None
     id_docente:int
     nombre:str|None
-    dia_semana:str
+    id_periodo:int
+    periodo:str|None
+    dia_semana:int
     hora_inicio:str
     hora_fin:str
-    observacion:str
+    observacion:str|None

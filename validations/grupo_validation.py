@@ -1,19 +1,19 @@
 from config.db_config import get_db_connection
-from controllers.semestre_controller import SemestreController
+from controllers.periodo_controller import PeriodoController
 from controllers.asignatura_controller import AsignaturaController
 from controllers.jornada_controller import JornadaController
 from models.grupo_model import Grupo
 
 def validate(data: Grupo):
-    semestre_controller = SemestreController()
+    periodo_controller = PeriodoController()
     asignatura_controller = AsignaturaController()
     jornada_controller = JornadaController()
 
-    # Validar que el semestre exista
+    # Validar que el periodo exista
     try:
-        semestre_controller.get_semestre(data.id_semestre)
+        periodo_controller.get_periodo(data.id_periodo)
     except Exception:
-        return {"error": "Semestre no existe"}
+        return {"error": "Periodo no existe"}
 
     # Validar que la asignatura exista
     try:

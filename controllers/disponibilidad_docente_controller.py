@@ -10,7 +10,7 @@ class DisponibilidadDocenteController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO disponibilidad_docente (id_docente, dia_semana, hora_inicio, hora_fin, observacion) VALUES (%s,%s,%s,%s,%s)", (disponibilidadDocente.id_docente,disponibilidadDocente.dia_semana,disponibilidadDocente.hora_inicio,disponibilidadDocente.hora_fin,disponibilidadDocente.observacion))
+            cursor.execute("INSERT INTO disponibilidad_docente (id_docente, id_periodo, dia_semana, hora_inicio, hora_fin, observacion) VALUES (%s, %s, %s, %s, %s, %s)", (disponibilidadDocente.id_docente, disponibilidadDocente.id_periodo, disponibilidadDocente.dia_semana, disponibilidadDocente.hora_inicio, disponibilidadDocente.hora_fin, disponibilidadDocente.observacion))
             conn.commit()
             conn.close()
             return {"resultado": "disponibilidadDocente creado"}
@@ -28,7 +28,7 @@ class DisponibilidadDocenteController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT dd.id_disponibilidad, dd.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido, dd.dia_semana, dd.hora_inicio, dd.hora_fin, dd.observacion FROM disponibilidad_docente dd join docentes d on dd.id_docente = d.id_docente WHERE id_disponibilidad = %s", (disponibilidad_id,))
+            cursor.execute("SELECT dd.id_disponibilidad, dd.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido, dd.id_periodo, p.nombre, dd.dia_semana, dd.hora_inicio, dd.hora_fin, dd.observacion FROM disponibilidad_docente dd join docentes d on dd.id_docente = d.id_docente join periodos p on dd.id_periodo = p.id_periodo WHERE id_disponibilidad = %s", (disponibilidad_id,))
             result = cursor.fetchone()
 
             if result:
@@ -36,10 +36,12 @@ class DisponibilidadDocenteController:
                         'id':int(result[0]),
                         'id_docente':int(result[1]),
                         'nombre':f"{result[2]} {result[3] if result[3] else ''} {result[4]} {result[5] if result[5] else ''}".strip(),
-                        'dia_semana':result[6],
-                        'hora_inicio':result[7],
-                        'hora_fin':result[8],
-                        'observacion':result[9]
+                        'id_periodo':int(result[6]),
+                        'periodo':result[7],
+                        'dia_semana':int(result[8]),
+                        'hora_inicio':result[9],
+                        'hora_fin':result[10],
+                        'observacion':result[11]
                 }
                 
                 json_data = jsonable_encoder(content)            
@@ -63,7 +65,7 @@ class DisponibilidadDocenteController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT dd.id_disponibilidad, dd.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido, dd.dia_semana, dd.hora_inicio, dd.hora_fin, dd.observacion FROM disponibilidad_docente dd join docentes d on dd.id_docente = d.id_docente")
+            cursor.execute("SELECT dd.id_disponibilidad, dd.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido, dd.id_periodo, p.nombre, dd.dia_semana, dd.hora_inicio, dd.hora_fin, dd.observacion FROM disponibilidad_docente dd join docentes d on dd.id_docente = d.id_docente join periodos p on dd.id_periodo = p.id_periodo")
             result = cursor.fetchall()
 
             if result:
@@ -71,13 +73,15 @@ class DisponibilidadDocenteController:
                 content = {} 
                 for data in result:
                     content={
-                        'id':data[0],
-                        'id_docente':data[1],
+                        'id':int(data[0]),
+                        'id_docente':int(data[1]),
                         'nombre':f"{data[2]} {data[3] if data[3] else ''} {data[4]} {data[5] if data[5] else ''}".strip(),
-                        'dia_semana':data[6],
-                        'hora_inicio':data[7],
-                        'hora_fin':data[8],
-                        'observacion':data[9]
+                        'id_periodo':int(data[6]),
+                        'periodo':data[7],
+                        'dia_semana':int(data[8]),
+                        'hora_inicio':data[9],
+                        'hora_fin':data[10],
+                        'observacion':data[11]
                     }
                     payload.append(content)
                     content = {}

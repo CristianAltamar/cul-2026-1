@@ -1,28 +1,28 @@
 from fastapi import APIRouter, HTTPException
-from controllers.semestre_controller import *
-from models.semestre_model import Semestre
-from validations.semestre_validation import validate
+from controllers.periodo_controller import *
+from models.periodo_model import Periodo
+from validations.periodo_validation import validate
 
 router = APIRouter()
 
-nuevo_semestre = SemestreController()
+nuevo_periodo = PeriodoController()
 
 
-@router.post("/create_semestre")
-async def create_semestre(semestre: Semestre):
-    validation = validate(semestre)
+@router.post("/create_periodo")
+async def create_periodo(periodo: Periodo):
+    validation = validate(periodo)
     if "error" in validation:
         raise HTTPException(status_code=400, detail=validation["error"])
-    rpta = nuevo_semestre.create_semestre(semestre)
+    rpta = nuevo_periodo.create_periodo(periodo)
     return rpta
 
 
-@router.get("/get_semestre/{semestre_id}",response_model=Semestre)
-async def get_semestre(semestre_id: int):
-    rpta = nuevo_semestre.get_semestre(semestre_id)
+@router.get("/get_periodo/{periodo_id}",response_model=Periodo)
+async def get_periodo(periodo_id: int):
+    rpta = nuevo_periodo.get_periodo(periodo_id)
     return rpta
 
-@router.get("/get_semestres/")
-async def get_semestres():
-    rpta = nuevo_semestre.get_semestres()
+@router.get("/get_periodos/")
+async def get_periodos():
+    rpta = nuevo_periodo.get_periodos()
     return rpta

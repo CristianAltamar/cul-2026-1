@@ -10,7 +10,7 @@ class GrupoController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO grupos (id_semestre,id_asignatura,id_jornada,codigo_grupo,cupo,estado) VALUES (%s,%s,%s,%s,%s,%s)", (grupo.id_semestre,grupo.id_asignatura,grupo.id_jornada,grupo.codigo,grupo.cupo,grupo.estado))
+            cursor.execute("INSERT INTO grupos (id_periodo,id_asignatura,id_jornada,codigo_grupo,cupo,estado) VALUES (%s,%s,%s,%s,%s,%s)", (grupo.id_periodo,grupo.id_asignatura,grupo.id_jornada,grupo.codigo,grupo.cupo,grupo.estado))
             conn.commit()
             conn.close()
             return {"resultado": "grupo creado"}
@@ -28,14 +28,14 @@ class GrupoController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT g.id_grupo, g.id_semestre, s.nombre, g.id_asignatura, a.nombre, g.id_jornada, j.nombre, g.codigo_grupo, g.cupo, g.estado FROM grupos g join semestres s on g.id_semestre = s.id_semestre join asignaturas a on g.id_asignatura = a.id_asignatura join jornadas j on g.id_jornada = j.id_jornada WHERE id_grupo = %s", (grupo_id,))
+            cursor.execute("SELECT g.id_grupo, g.id_periodo, s.nombre, g.id_asignatura, a.nombre, g.id_jornada, j.nombre, g.codigo_grupo, g.cupo, g.estado FROM grupos g join periodos s on g.id_periodo = s.id_periodo join asignaturas a on g.id_asignatura = a.id_asignatura join jornadas j on g.id_jornada = j.id_jornada WHERE id_grupo = %s", (grupo_id,))
             result = cursor.fetchone()
             
             if result:
                 content={
                         'id':int(result[0]),
-                        'id_semestre':int(result[1]),
-                        'semestre':result[2],
+                        'id_periodo':int(result[1]),
+                        'periodo':result[2],
                         'id_asignatura':int(result[3]),
                         'asignatura':result[4],
                         'id_jornada':int(result[5]),
@@ -66,7 +66,7 @@ class GrupoController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT g.id_grupo, g.id_semestre, s.nombre, g.id_asignatura, a.nombre, g.id_jornada, j.nombre, g.codigo_grupo, g.cupo, g.estado FROM grupos g join semestres s on g.id_semestre = s.id_semestre join asignaturas a on g.id_asignatura = a.id_asignatura join jornadas j on g.id_jornada = j.id_jornada")
+            cursor.execute("SELECT g.id_grupo, g.id_periodo, s.nombre, g.id_asignatura, a.nombre, g.id_jornada, j.nombre, g.codigo_grupo, g.cupo, g.estado FROM grupos g join periodos s on g.id_periodo = s.id_periodo join asignaturas a on g.id_asignatura = a.id_asignatura join jornadas j on g.id_jornada = j.id_jornada")
             result = cursor.fetchall()
 
             if result:
@@ -75,8 +75,8 @@ class GrupoController:
                 for data in result:
                     content={
                         'id':data[0],
-                        'id_semestre':data[1],
-                        'semestre':data[2],
+                        'id_periodo':data[1],
+                        'periodo':data[2],
                         'id_asignatura':data[3],
                         'asignatura':data[4],
                         'id_jornada':data[5],
