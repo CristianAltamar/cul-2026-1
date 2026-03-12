@@ -8,6 +8,6 @@ class Usuario(BaseModel):
     segundo_apellido: str | None
     email: str
     password_hash: str
-    id_rol: int
+    id_rol: int = 2
     rol: str | None
     activo: bool

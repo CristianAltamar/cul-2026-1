@@ -20,8 +20,9 @@ app = FastAPI()
 origins = [
     #"http://localhost.tiangolo.com",
     #"https://ep-square-flower-aiq3n3y4-pooler.c-4.us-east-1.aws.neon.tech",
-    "http://localhost"
-    #"http://localhost:8080",
+    "http://localhost",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
 ]
 
 app.add_middleware(
