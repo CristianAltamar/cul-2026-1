@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from controllers.facultad_controller import *
 from models.facultad_model import Facultad
 
-router = APIRouter()
+router = APIRouter(tags=["Facultades"])
 
 nuevo_facultad = FacultadController()
 

@@ -4,7 +4,7 @@ from middlewares.protected_routes import require_role
 from models.salon_model import Salon
 from validations.salon_validation import validate
 
-router = APIRouter()
+router = APIRouter(tags=["Salones"])
 
 nuevo_salon = SalonController()
 
