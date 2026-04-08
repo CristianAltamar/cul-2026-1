@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from validations.login_validation import validate
 from models.login_model import Login
 
-router = APIRouter()
+router = APIRouter(tags=["Autenticación/Login"])
 
 @router.post("/login")
 async def login(login:Login):

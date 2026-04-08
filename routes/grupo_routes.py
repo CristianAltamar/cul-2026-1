@@ -3,7 +3,7 @@ from controllers.grupo_controller import *
 from models.grupo_model import Grupo
 from validations.grupo_validation import validate
 
-router = APIRouter()
+router = APIRouter(tags=["Grupos"])
 
 nuevo_grupo = GrupoController()
 

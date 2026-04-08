@@ -3,7 +3,7 @@ from controllers.docente_controller import *
 from models.docente_model import Docente
 from validations.docente_validation import validate
 
-router = APIRouter()
+router = APIRouter(tags=["Docentes"])
 
 nuevo_docente = DocenteController()
 

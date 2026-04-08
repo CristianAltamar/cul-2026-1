@@ -4,7 +4,7 @@ from models.horario_model import Horario
 from validations.horario_validation import validate
 from middlewares.protected_routes import get_current_user, require_role
 
-router = APIRouter()
+router = APIRouter(tags=["Horarios"])
 
 nuevo_horario = HorarioController()
 

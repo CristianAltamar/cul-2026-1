@@ -3,7 +3,7 @@ from controllers.programa_controller import *
 from models.programa_model import Programa
 from validations.programa_validation import validate
 
-router = APIRouter()
+router = APIRouter(tags=["Programas"])
 
 nuevo_programa = ProgramaController()
 

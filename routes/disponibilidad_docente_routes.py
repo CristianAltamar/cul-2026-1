@@ -3,7 +3,7 @@ from controllers.disponibilidad_docente_controller import *
 from models.disponibilidad_docente_model import DisponibilidadDocente
 from validations.disponibilidad_docente_validation import validate
 
-router = APIRouter()
+router = APIRouter(tags=["Disponibilidad Docente"])
 
 nuevo_disponibilidad_docente = DisponibilidadDocenteController()
 

@@ -3,7 +3,7 @@ from controllers.periodo_controller import *
 from models.periodo_model import Periodo
 from validations.periodo_validation import validate
 
-router = APIRouter()
+router = APIRouter(tags=["Semestres / Periodos"])
 
 nuevo_periodo = PeriodoController()
 
