@@ -10,7 +10,7 @@ class HorarioController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO horarios (id_grupo, id_docente, id_salon, id_jornada, dia_semana, hora_inicio, hora_fin) VALUES (%s, %s, %s, %s, %s, %s, %s)", (horario.id_grupo, horario.id_docente, horario.id_salon, horario.id_jornada, horario.dia_semana, horario.hora_inicio, horario.hora_fin))
+            cursor.execute("INSERT INTO horarios (id_grupo, id_docente, id_jornada, dia_semana, hora_inicio, hora_fin) VALUES (%s, %s, %s, %s, %s, %s, %s)", (horario.id_grupo, horario.id_docente, horario.id_jornada, horario.dia_semana, horario.hora_inicio, horario.hora_fin))
             conn.commit()
             conn.close()
             return {"resultado": "horario creado"}
@@ -28,7 +28,7 @@ class HorarioController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT h.id_horario, h.id_grupo, g.codigo_grupo, h.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido, h.id_salon, s.codigo, h.id_jornada , j.nombre, h.dia_semana, h.hora_inicio, h.hora_fin FROM horarios h join grupos g on h.id_grupo = g.id_grupo join docentes d on h.id_docente = d.id_docente join salones s on h.id_salon = s.id_salon join jornadas j on h.id_jornada = j.id_jornada WHERE h.id_horario = %s", (horario_id,))
+            cursor.execute("SELECT h.id_horario, h.id_grupo, g.codigo_grupo, h.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido, h.id_jornada , j.nombre, h.dia_semana, h.hora_inicio, h.hora_fin FROM horarios h join grupos g on h.id_grupo = g.id_grupo join docentes d on h.id_docente = d.id_docente join jornadas j on h.id_jornada = j.id_jornada WHERE h.id_horario = %s", (horario_id,))
             result = cursor.fetchone()
             
             if result:
@@ -38,8 +38,6 @@ class HorarioController:
                         'codigo_grupo':result[2],
                         'id_docente':int(result[3]),
                         'docente':f"{result[4]} {result[5] if result[5] else ''} {result[6]} {result[7] if result[7] else ''}".strip(),
-                        'id_salon':int(result[8]),
-                        'codigo_salon':result[9],
                         'id_jornada':int(result[10]),
                         'jornada':result[11],
                         'dia_semana':result[12],
@@ -68,7 +66,7 @@ class HorarioController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT h.id_horario, h.id_grupo, g.codigo_grupo, h.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido, h.id_salon, s.codigo, h.id_jornada , j.nombre, h.dia_semana, h.hora_inicio, h.hora_fin FROM horarios h join grupos g on h.id_grupo = g.id_grupo join docentes d on h.id_docente = d.id_docente join salones s on h.id_salon = s.id_salon join jornadas j on h.id_jornada = j.id_jornada WHERE h.id_docente = %s", (docente_id,))
+            cursor.execute("SELECT h.id_horario, h.id_grupo, g.codigo_grupo, h.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido, h.id_jornada , j.nombre, h.dia_semana, h.hora_inicio, h.hora_fin FROM horarios h join grupos g on h.id_grupo = g.id_grupo join docentes d on h.id_docente = d.id_docente join jornadas j on h.id_jornada = j.id_jornada WHERE h.id_docente = %s", (docente_id,))
             result = cursor.fetchall()
 
             if result:
@@ -81,8 +79,6 @@ class HorarioController:
                             'codigo_grupo':data[2],
                             'id_docente':int(data[3]),
                             'docente':f"{data[4]} {data[5] if data[5] else ''} {data[6]} {data[7] if data[7] else ''}".strip(),
-                            'id_salon':int(data[8]),
-                            'codigo_salon':data[9],
                             'id_jornada':int(data[10]),
                             'jornada':data[11],
                             'dia_semana':data[12],
@@ -111,7 +107,7 @@ class HorarioController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT h.id_horario, h.id_grupo, g.codigo_grupo, h.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido, h.id_salon, s.codigo, h.id_jornada , j.nombre, h.dia_semana, h.hora_inicio, h.hora_fin FROM horarios h join grupos g on h.id_grupo = g.id_grupo join docentes d on h.id_docente = d.id_docente join salones s on h.id_salon = s.id_salon join jornadas j on h.id_jornada = j.id_jornada")
+            cursor.execute("SELECT h.id_horario, h.id_grupo, g.codigo_grupo, h.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido, h.id_jornada , j.nombre, h.dia_semana, h.hora_inicio, h.hora_fin FROM horarios h join grupos g on h.id_grupo = g.id_grupo join docentes d on h.id_docente = d.id_docente join jornadas j on h.id_jornada = j.id_jornada")
             result = cursor.fetchall()
 
             if result:
@@ -124,8 +120,6 @@ class HorarioController:
                         'codigo_grupo':data[2],
                         'id_docente':data[3],
                         'docente':f"{data[4]} {data[5] if data[5] else ''} {data[6]} {data[7] if data[7] else ''}".strip(),
-                        'id_salon':data[8],
-                        'codigo_salon':data[9],
                         'id_jornada':data[10],
                         'jornada':data[11],
                         'dia_semana':data[12],

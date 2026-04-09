@@ -24,28 +24,32 @@ class DisponibilidadDocenteController:
             conn.close()
         
 
-    def get_disponibilidad_docente(self, disponibilidad_id: int):
+    def get_disponibilidad_docente(self, docente_id: int):
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT dd.id_disponibilidad, dd.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido, dd.id_periodo, p.nombre, dd.dia_semana, dd.hora_inicio, dd.hora_fin, dd.observacion FROM disponibilidad_docente dd join docentes d on dd.id_docente = d.id_docente join periodos p on dd.id_periodo = p.id_periodo WHERE id_disponibilidad = %s", (disponibilidad_id,))
+            cursor.execute("SELECT dd.id_disponibilidad, dd.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido, dd.id_periodo, p.nombre, dd.dia_semana, dd.hora_inicio, dd.hora_fin, dd.observacion FROM disponibilidad_docente dd join docentes d on dd.id_docente = d.id_docente join periodos p on dd.id_periodo = p.id_periodo WHERE id_docente = %s", (docente_id,))
             result = cursor.fetchone()
 
             if result:
-                content={
-                        'id':int(result[0]),
-                        'id_docente':int(result[1]),
-                        'nombre':f"{result[2]} {result[3] if result[3] else ''} {result[4]} {result[5] if result[5] else ''}".strip(),
-                        'id_periodo':int(result[6]),
-                        'periodo':result[7],
-                        'dia_semana':int(result[8]),
-                        'hora_inicio':result[9],
-                        'hora_fin':result[10],
-                        'observacion':result[11]
-                }
-                
-                json_data = jsonable_encoder(content)            
-                return  json_data
+                payload = []
+                content = {}
+                for data in result:
+                    content={
+                            'id':int(data[0]),
+                            'id_docente':int(data[1]),
+                            'nombre':f"{data[2]} {data[3] if data[3] else ''} {data[4]} {data[5] if data[5] else ''}".strip(),
+                            'id_periodo':int(data[6]),
+                            'periodo':data[7],
+                            'dia_semana':int(data[8]),
+                            'hora_inicio':data[9],
+                            'hora_fin':data[10],
+                            'observacion':data[11]
+                    }
+                    payload.append(content)
+                    content = {}
+                json_data = jsonable_encoder(payload)
+                return json_data
             else:
                 ##Esto interrumpe la ejecución y responde al cliente con un código 404
                 ## comunica al cliente de la API qué pasó (error HTTP).

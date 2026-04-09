@@ -6,7 +6,6 @@ from routes.disponibilidad_docente_routes import router as disponibilidad_docent
 from routes.grupo_routes import router as grupo_router
 from routes.horario_routes import router as horario_router
 from routes.jornada_routes import router as jornada_router
-from routes.salon_routes import router as salon_router
 from routes.programa_routes import router as programa_router
 from routes.docente_asignatura_routes import router as docente_asignatura_router
 from routes.facultad_routes import router as facultad_router
@@ -16,8 +15,6 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 
 origins = [
-    #"http://localhost.tiangolo.com",
-    #"https://ep-square-flower-aiq3n3y4-pooler.c-4.us-east-1.aws.neon.tech",
     "http://localhost",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
@@ -38,7 +35,6 @@ app.include_router(disponibilidad_docente_router)
 app.include_router(grupo_router)
 app.include_router(horario_router)
 app.include_router(jornada_router)
-app.include_router(salon_router)
 app.include_router(programa_router)
 app.include_router(docente_asignatura_router)
 app.include_router(facultad_router)

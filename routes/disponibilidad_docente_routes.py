@@ -18,9 +18,9 @@ async def create_disponibilidad_docente(disponibilidadDocente: DisponibilidadDoc
     return rpta
 
 
-@router.get("/get_disponibilidad_docente/{disponibilidadDocente_id}",response_model=DisponibilidadDocente)
-async def get_disponibilidad_docente(disponibilidadDocente_id: int):
-    rpta = nuevo_disponibilidad_docente.get_disponibilidad_docente(disponibilidadDocente_id)
+@router.get("/get_disponibilidad_docente/{docente_id}",response_model=DisponibilidadDocente)
+async def get_disponibilidad_docente(docente_id: int):
+    rpta = nuevo_disponibilidad_docente.get_disponibilidad_docente(docente_id)
     return rpta
 
 @router.get("/get_disponibilidad_docentes/")
