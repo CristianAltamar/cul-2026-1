@@ -28,8 +28,8 @@ class DisponibilidadDocenteController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT dd.id_disponibilidad, dd.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido, dd.id_periodo, p.nombre, dd.dia_semana, dd.hora_inicio, dd.hora_fin, dd.observacion FROM disponibilidad_docente dd join docentes d on dd.id_docente = d.id_docente join periodos p on dd.id_periodo = p.id_periodo WHERE id_docente = %s", (docente_id,))
-            result = cursor.fetchone()
+            cursor.execute("SELECT dd.id_disponibilidad, dd.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido, dd.id_periodo, p.nombre, dd.dia_semana, dd.hora_inicio, dd.hora_fin, dd.observacion FROM disponibilidad_docente dd join docentes d on dd.id_docente = d.id_docente join periodos p on dd.id_periodo = p.id_periodo WHERE dd.id_docente = %s", (docente_id,))
+            result = cursor.fetchall()
 
             if result:
                 payload = []
