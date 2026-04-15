@@ -7,6 +7,7 @@ docente_controller = DocenteController()
 disponibilidad_controller = DisponibilidadDocenteController()
 
 def validate(data: DisponibilidadDocente):
+    #Validar que el docente exista
     try:
         docente_controller.get_docente(data.id_docente)
     except Exception:

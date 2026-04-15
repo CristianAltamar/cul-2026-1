@@ -13,7 +13,7 @@ class DisponibilidadDocenteController:
             cursor = conn.cursor()
             cursor.execute("INSERT INTO disponibilidad_docente (id_docente, id_periodo, dia_semana, hora_inicio, hora_fin, observacion) VALUES (%s, %s, %s, %s, %s, %s)", (disponibilidadDocente.id_docente, disponibilidadDocente.id_periodo, disponibilidadDocente.dia_semana, disponibilidadDocente.hora_inicio, disponibilidadDocente.hora_fin, disponibilidadDocente.observacion))
             conn.commit()
-            conn.close()
+            self.cleanup_disponibilidad(disponibilidadDocente.id_docente, disponibilidadDocente.id_periodo, disponibilidadDocente.dia_semana)
             return {"resultado": "disponibilidadDocente creado"}
         except psycopg2.Error as err:
             print(err)
@@ -32,6 +32,11 @@ class DisponibilidadDocenteController:
             values = [(dd.id_docente, dd.id_periodo, dd.dia_semana, dd.hora_inicio, dd.hora_fin, dd.observacion) for dd in disponibilidadDocentes]
             cursor.executemany("INSERT INTO disponibilidad_docente (id_docente, id_periodo, dia_semana, hora_inicio, hora_fin, observacion) VALUES (%s, %s, %s, %s, %s, %s)", values)
             conn.commit()
+
+            unique_keys = set((dd.id_docente, dd.id_periodo, dd.dia_semana) for dd in disponibilidadDocentes)
+            for docente_id, periodo_id, dia_semana in unique_keys:
+                self.cleanup_disponibilidad(docente_id, periodo_id, dia_semana)
+
             return {"resultado": "disponibilidades docentes creadas"}
         except psycopg2.Error as err:
             print(err)
@@ -40,6 +45,55 @@ class DisponibilidadDocenteController:
         finally:
             conn.close()
         
+
+    def cleanup_disponibilidad(self, docente_id: int, periodo_id: int, dia_semana: int):
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT id_disponibilidad, hora_inicio, hora_fin, observacion FROM disponibilidad_docente WHERE id_docente = %s AND id_periodo = %s AND dia_semana = %s ORDER BY hora_inicio",
+                (docente_id, periodo_id, dia_semana),
+            )
+            rows = cursor.fetchall()
+            if not rows:
+                return
+
+            merged = []
+            for id_disponibilidad, hora_inicio, hora_fin, observacion in rows:
+                if not merged or hora_inicio > merged[-1][2]:
+                    merged.append([id_disponibilidad, hora_inicio, hora_fin, observacion or ""])
+                else:
+                    if hora_fin > merged[-1][2]:
+                        merged[-1][2] = hora_fin
+                    if not merged[-1][3] and observacion:
+                        merged[-1][3] = observacion
+                    elif observacion and observacion not in merged[-1][3]:
+                        merged[-1][3] = f"{merged[-1][3]}; {observacion}" if merged[-1][3] else observacion
+
+            if len(merged) == len(rows) and all(
+                merged_i[1] == rows[i][1] and merged_i[2] == rows[i][2] and merged_i[3] == (rows[i][3] or "")
+                for i, merged_i in enumerate(merged)
+            ):
+                return
+
+            keep_ids = {segment[0] for segment in merged}
+            for id_disponibilidad, hora_inicio, hora_fin, observacion in merged:
+                cursor.execute(
+                    "UPDATE disponibilidad_docente SET hora_inicio = %s, hora_fin = %s, observacion = %s WHERE id_disponibilidad = %s",
+                    (hora_inicio, hora_fin, observacion, id_disponibilidad),
+                )
+
+            delete_ids = [row[0] for row in rows if row[0] not in keep_ids]
+            if delete_ids:
+                cursor.execute("DELETE FROM disponibilidad_docente WHERE id_disponibilidad IN %s", (tuple(delete_ids),))
+
+            conn.commit()
+        except psycopg2.Error as err:
+            print(err)
+            conn.rollback()
+            raise HTTPException(status_code=500, detail="Error al limpiar disponibilidades docentes")
+        finally:
+            conn.close()
 
     def get_disponibilidad_exact(self, disponibilidadDocente: DisponibilidadDocente):
         try:
@@ -97,6 +151,7 @@ class DisponibilidadDocenteController:
                 ),
             )
             conn.commit()
+            self.cleanup_disponibilidad(disponibilidadDocente.id_docente, disponibilidadDocente.id_periodo, disponibilidadDocente.dia_semana)
             return {"resultado": "disponibilidadDocente actualizada"}
         except psycopg2.Error as err:
             print(err)
