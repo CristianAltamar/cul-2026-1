@@ -23,11 +23,8 @@ async def create_multiple_disponibilidad_docente(disponibilidadDocentes: List[Di
     validation = validate_multiple_disponibilidad_docentes(disponibilidadDocentes)
     if "error" in validation:
         raise HTTPException(status_code=400, detail=validation["error"])
-
-    if not validation["new_items"]:
-        return {"resultado": "No hay disponibilidades nuevas para crear"}
     
-    rpta = nuevo_disponibilidad_docente.create_multiple_disponibilidad_docente(validation["new_items"])
+    rpta = nuevo_disponibilidad_docente.create_multiple_disponibilidad_docente(validation["new_items"], disponibilidadDocentes)
     return rpta
 
 @router.get("/get_disponibilidad_docente/{docente_id}")

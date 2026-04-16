@@ -25,19 +25,24 @@ class DisponibilidadDocenteController:
             conn.close()
         
 
-    def create_multiple_disponibilidad_docente(self, disponibilidadDocentes: List[DisponibilidadDocente]):
+    def create_multiple_disponibilidad_docente(self, disponibilidadDocentes: List[DisponibilidadDocente], request_items: List[DisponibilidadDocente]):
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
             values = [(dd.id_docente, dd.id_periodo, dd.dia_semana, dd.hora_inicio, dd.hora_fin, dd.observacion) for dd in disponibilidadDocentes]
-            cursor.executemany("INSERT INTO disponibilidad_docente (id_docente, id_periodo, dia_semana, hora_inicio, hora_fin, observacion) VALUES (%s, %s, %s, %s, %s, %s)", values)
-            conn.commit()
+            if values:
+                cursor.executemany("INSERT INTO disponibilidad_docente (id_docente, id_periodo, dia_semana, hora_inicio, hora_fin, observacion) VALUES (%s, %s, %s, %s, %s, %s)", values)
+                conn.commit()
 
-            unique_keys = set((dd.id_docente, dd.id_periodo, dd.dia_semana) for dd in disponibilidadDocentes)
+            unique_keys = set((dd.id_docente, dd.id_periodo, dd.dia_semana) for dd in request_items)
             for docente_id, periodo_id, dia_semana in unique_keys:
-                self.cleanup_disponibilidad(docente_id, periodo_id, dia_semana)
+                current_items = [
+                    item for item in request_items
+                    if item.id_docente == docente_id and item.id_periodo == periodo_id and item.dia_semana == dia_semana
+                ]
+                self.cleanup_disponibilidad(docente_id, periodo_id, dia_semana, current_items=current_items)
 
-            return {"resultado": "disponibilidades docentes creadas"}
+            return {"resultado": "disponibilidades docentes procesadas"}
         except psycopg2.Error as err:
             print(err)
             conn.rollback()
@@ -46,7 +51,7 @@ class DisponibilidadDocenteController:
             conn.close()
         
 
-    def cleanup_disponibilidad(self, docente_id: int, periodo_id: int, dia_semana: int):
+    def cleanup_disponibilidad(self, docente_id: int, periodo_id: int, dia_semana: int, current_items: List[DisponibilidadDocente] = None):
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
@@ -55,8 +60,20 @@ class DisponibilidadDocenteController:
                 (docente_id, periodo_id, dia_semana),
             )
             rows = cursor.fetchall()
+
             if not rows:
                 return
+
+            if current_items is not None:
+                keep_ranges = {(item.hora_inicio, item.hora_fin) for item in current_items}
+                delete_ids = [row[0] for row in rows if (str(row[1]), str(row[2])) not in keep_ranges]
+                if delete_ids:
+                    cursor.execute("DELETE FROM disponibilidad_docente WHERE id_disponibilidad IN %s", (tuple(delete_ids),))
+                    rows = [row for row in rows if row[0] not in delete_ids]
+
+                if not rows:
+                    conn.commit()
+                    return
 
             merged = []
             for id_disponibilidad, hora_inicio, hora_fin, observacion in rows:
@@ -74,6 +91,7 @@ class DisponibilidadDocenteController:
                 merged_i[1] == rows[i][1] and merged_i[2] == rows[i][2] and merged_i[3] == (rows[i][3] or "")
                 for i, merged_i in enumerate(merged)
             ):
+                conn.commit()
                 return
 
             keep_ids = {segment[0] for segment in merged}
