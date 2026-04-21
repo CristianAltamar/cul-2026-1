@@ -3,14 +3,19 @@ from fastapi import HTTPException
 from config.db_config import get_db_connection
 from models.horario_model import Horario
 from fastapi.encoders import jsonable_encoder
+from validations.horario_validation import validate
     
 class HorarioController:
         
     def create_horario(self, horario: Horario):   
+        validation = validate(horario)
+        if 'error' in validation:
+            raise HTTPException(status_code=400, detail=validation['error'])
+        
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO horarios (id_grupo, id_docente, id_jornada, dia_semana, hora_inicio, hora_fin) VALUES (%s, %s, %s, %s, %s, %s, %s)", (horario.id_grupo, horario.id_docente, horario.id_jornada, horario.dia_semana, horario.hora_inicio, horario.hora_fin))
+            cursor.execute("INSERT INTO horarios (id_grupo, id_docente, id_jornada, dia_semana, hora_inicio, hora_fin, id_periodo) VALUES (%s, %s, %s, %s, %s, %s, %s)", (horario.id_grupo, horario.id_docente, horario.id_jornada, horario.dia_semana, horario.hora_inicio, horario.hora_fin, horario.id_periodo))
             conn.commit()
             conn.close()
             return {"resultado": "horario creado"}
@@ -28,7 +33,7 @@ class HorarioController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT h.id_horario, h.id_grupo, g.codigo_grupo, h.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido, h.id_jornada , j.nombre, h.dia_semana, h.hora_inicio, h.hora_fin FROM horarios h join grupos g on h.id_grupo = g.id_grupo join docentes d on h.id_docente = d.id_docente join jornadas j on h.id_jornada = j.id_jornada WHERE h.id_horario = %s", (horario_id,))
+            cursor.execute("SELECT h.id_horario, h.id_grupo, g.codigo_grupo, h.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido, h.id_jornada , j.nombre, h.dia_semana, h.hora_inicio, h.hora_fin, h.id_periodo, p.nombre  FROM horarios h join grupos g on h.id_grupo = g.id_grupo join docentes d on h.id_docente = d.id_docente join jornadas j on h.id_jornada = j.id_jornada join periodos p on h.id_periodo = p.id_periodo WHERE h.id_horario = %s", (horario_id,))
             result = cursor.fetchone()
             
             if result:
@@ -42,7 +47,9 @@ class HorarioController:
                         'jornada':result[11],
                         'dia_semana':result[12],
                         'hora_inicio':result[13],
-                        'hora_fin':result[14]
+                        'hora_fin':result[14],
+                        'id_periodo':int(result[15]),
+                        'periodo':result[16]
                 }
                 
                 json_data = jsonable_encoder(content)            
@@ -66,7 +73,7 @@ class HorarioController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT h.id_horario, h.id_grupo, g.codigo_grupo, h.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido, h.id_jornada , j.nombre, h.dia_semana, h.hora_inicio, h.hora_fin FROM horarios h join grupos g on h.id_grupo = g.id_grupo join docentes d on h.id_docente = d.id_docente join jornadas j on h.id_jornada = j.id_jornada WHERE h.id_docente = %s", (docente_id,))
+            cursor.execute("SELECT h.id_horario, h.id_grupo, g.codigo_grupo, h.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido, h.id_jornada , j.nombre, h.dia_semana, h.hora_inicio, h.hora_fin, h.id_periodo, p.nombre FROM horarios h join grupos g on h.id_grupo = g.id_grupo join docentes d on h.id_docente = d.id_docente join jornadas j on h.id_jornada = j.id_jornada join periodos p on h.id_periodo = p.id_periodo WHERE h.id_docente = %s", (docente_id,))
             result = cursor.fetchall()
 
             if result:
@@ -83,7 +90,9 @@ class HorarioController:
                             'jornada':data[11],
                             'dia_semana':data[12],
                             'hora_inicio':data[13],
-                            'hora_fin':data[14]
+                            'hora_fin':data[14],
+                            'id_periodo':int(data[15]),
+                            'periodo':data[16]
                         }
                     payload.append(content)
                 json_data = jsonable_encoder(payload)            
@@ -107,7 +116,7 @@ class HorarioController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT h.id_horario, h.id_grupo, g.codigo_grupo, h.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido, h.id_jornada , j.nombre, h.dia_semana, h.hora_inicio, h.hora_fin FROM horarios h join grupos g on h.id_grupo = g.id_grupo join docentes d on h.id_docente = d.id_docente join jornadas j on h.id_jornada = j.id_jornada")
+            cursor.execute("SELECT h.id_horario, h.id_grupo, g.codigo_grupo, h.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido, h.id_jornada , j.nombre, h.dia_semana, h.hora_inicio, h.hora_fin, h.id_periodo, p.nombre FROM horarios h join grupos g on h.id_grupo = g.id_grupo join docentes d on h.id_docente = d.id_docente join jornadas j on h.id_jornada = j.id_jornada join periodos p on h.id_periodo = p.id_periodo")
             result = cursor.fetchall()
 
             if result:
@@ -124,7 +133,9 @@ class HorarioController:
                         'jornada':data[11],
                         'dia_semana':data[12],
                         'hora_inicio':data[13],
-                        'hora_fin':data[14]
+                        'hora_fin':data[14],
+                        'id_periodo':int(data[15]),
+                        'periodo':data[16]
                     }
                     payload.append(content)
                     content = {}

@@ -1,7 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from controllers.horario_controller import *
 from models.horario_model import Horario
-from validations.horario_validation import validate
 from middlewares.protected_routes import get_current_user, require_role
 
 router = APIRouter()
@@ -11,10 +10,6 @@ nuevo_horario = HorarioController()
 
 @router.post("/create_horario")
 async def create_horario(horario: Horario, user = Depends(require_role(1))):
-    validation = validate(horario)
-    if "error" in validation:
-        raise HTTPException(status_code=400, detail=validation["error"])
-    
     rpta = nuevo_horario.create_horario(horario)
     return rpta
 
