@@ -15,11 +15,7 @@ class HorarioController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-<<<<<<< HEAD
             cursor.execute("INSERT INTO horarios (id_grupo, id_docente, id_jornada, dia_semana, hora_inicio, hora_fin, id_asignatura) VALUES (%s, %s, %s, %s, %s, %s, %s)", (horario.id_grupo, horario.id_docente, horario.id_jornada, horario.dia_semana, horario.hora_inicio, horario.hora_fin, horario.id_asignatura))
-=======
-            cursor.execute("INSERT INTO horarios (id_grupo, id_docente, id_jornada, dia_semana, hora_inicio, hora_fin, id_periodo) VALUES (%s, %s, %s, %s, %s, %s, %s)", (horario.id_grupo, horario.id_docente, horario.id_jornada, horario.dia_semana, horario.hora_inicio, horario.hora_fin, horario.id_periodo))
->>>>>>> 9c9527b95fd314a3cea47194b2fff27143d59007
             conn.commit()
             conn.close()
             return {"resultado": "horario creado"}
@@ -37,11 +33,7 @@ class HorarioController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-<<<<<<< HEAD
             cursor.execute("SELECT h.id_horario, h.id_grupo, g.codigo_grupo, h.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido,  h.id_asignatura, a.nombre, h.id_jornada , j.nombre, h.dia_semana, h.hora_inicio, h.hora_fin FROM horarios h join grupos g on h.id_grupo = g.id_grupo join docentes d on h.id_docente = d.id_docente join asignaturas a on h.id_asignatura = a.id_asignatura join jornadas j on h.id_jornada = j.id_jornada WHERE h.id_horario = %s", (horario_id,))
-=======
-            cursor.execute("SELECT h.id_horario, h.id_grupo, g.codigo_grupo, h.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido, h.id_jornada , j.nombre, h.dia_semana, h.hora_inicio, h.hora_fin, h.id_periodo, p.nombre  FROM horarios h join grupos g on h.id_grupo = g.id_grupo join docentes d on h.id_docente = d.id_docente join jornadas j on h.id_jornada = j.id_jornada join periodos p on h.id_periodo = p.id_periodo WHERE h.id_horario = %s", (horario_id,))
->>>>>>> 9c9527b95fd314a3cea47194b2fff27143d59007
             result = cursor.fetchone()
             
             if result:
@@ -51,7 +43,6 @@ class HorarioController:
                         'codigo_grupo':result[2],
                         'id_docente':int(result[3]),
                         'docente':f"{result[4]} {result[5] if result[5] else ''} {result[6]} {result[7] if result[7] else ''}".strip(),
-<<<<<<< HEAD
                         'id_asignatura':int(result[10]),
                         'asignatura':result[11],
                         'id_jornada':int(result[12]),
@@ -59,15 +50,6 @@ class HorarioController:
                         'dia_semana':result[14],
                         'hora_inicio':result[15],
                         'hora_fin':result[16]
-=======
-                        'id_jornada':int(result[10]),
-                        'jornada':result[11],
-                        'dia_semana':result[12],
-                        'hora_inicio':result[13],
-                        'hora_fin':result[14],
-                        'id_periodo':int(result[15]),
-                        'periodo':result[16]
->>>>>>> 9c9527b95fd314a3cea47194b2fff27143d59007
                 }
                 
                 json_data = jsonable_encoder(content)            
@@ -91,11 +73,7 @@ class HorarioController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-<<<<<<< HEAD
             cursor.execute("SELECT h.id_horario, h.id_grupo, g.codigo_grupo, h.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido,  h.id_asignatura, a.nombre, h.id_jornada , j.nombre, h.dia_semana, h.hora_inicio, h.hora_fin FROM horarios h join grupos g on h.id_grupo = g.id_grupo join docentes d on h.id_docente = d.id_docente join asignaturas a on h.id_asignatura = a.id_asignatura join jornadas j on h.id_jornada = j.id_jornada WHERE h.id_periodo = %s AND h.id_jornada = %s AND h.id_docente = %s", (id_periodo, id_jornada, docente_id))
-=======
-            cursor.execute("SELECT h.id_horario, h.id_grupo, g.codigo_grupo, h.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido, h.id_jornada , j.nombre, h.dia_semana, h.hora_inicio, h.hora_fin, h.id_periodo, p.nombre FROM horarios h join grupos g on h.id_grupo = g.id_grupo join docentes d on h.id_docente = d.id_docente join jornadas j on h.id_jornada = j.id_jornada join periodos p on h.id_periodo = p.id_periodo WHERE h.id_docente = %s", (docente_id,))
->>>>>>> 9c9527b95fd314a3cea47194b2fff27143d59007
             result = cursor.fetchall()
 
             if result:
@@ -108,7 +86,6 @@ class HorarioController:
                             'codigo_grupo':data[2],
                             'id_docente':int(data[3]),
                             'docente':f"{data[4]} {data[5] if data[5] else ''} {data[6]} {data[7] if data[7] else ''}".strip(),
-<<<<<<< HEAD
                             'id_asignatura':int(data[10]),
                             'asignatura':data[11],
                             'id_jornada':int(data[12]),
@@ -116,15 +93,6 @@ class HorarioController:
                             'dia_semana':data[14],
                             'hora_inicio':data[15],
                             'hora_fin':data[16]
-=======
-                            'id_jornada':int(data[10]),
-                            'jornada':data[11],
-                            'dia_semana':data[12],
-                            'hora_inicio':data[13],
-                            'hora_fin':data[14],
-                            'id_periodo':int(data[15]),
-                            'periodo':data[16]
->>>>>>> 9c9527b95fd314a3cea47194b2fff27143d59007
                         }
                     payload.append(content)
                 json_data = jsonable_encoder(payload)            
@@ -148,11 +116,7 @@ class HorarioController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-<<<<<<< HEAD
             cursor.execute("SELECT h.id_horario, h.id_grupo, g.codigo_grupo, h.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido,  h.id_asignatura, a.nombre, h.id_jornada , j.nombre, h.dia_semana, h.hora_inicio, h.hora_fin FROM horarios h join grupos g on h.id_grupo = g.id_grupo join docentes d on h.id_docente = d.id_docente join asignaturas a on h.id_asignatura = a.id_asignatura join programas p on a.id_programa = p.id_programa join jornadas j on h.id_jornada = j.id_jornada  WHERE h.id_periodo = %s AND h.id_jornada = %s AND a.id_programa = %s", (id_periodo, id_jornada, id_programa))
-=======
-            cursor.execute("SELECT h.id_horario, h.id_grupo, g.codigo_grupo, h.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido, h.id_jornada , j.nombre, h.dia_semana, h.hora_inicio, h.hora_fin, h.id_periodo, p.nombre FROM horarios h join grupos g on h.id_grupo = g.id_grupo join docentes d on h.id_docente = d.id_docente join jornadas j on h.id_jornada = j.id_jornada join periodos p on h.id_periodo = p.id_periodo")
->>>>>>> 9c9527b95fd314a3cea47194b2fff27143d59007
             result = cursor.fetchall()
 
             if result:
