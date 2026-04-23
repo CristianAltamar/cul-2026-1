@@ -86,3 +86,33 @@ class JornadaController:
             raise HTTPException(status_code=500, detail="Error al obtener jornadas")
         finally:
             conn.close()
+    
+    def update_jornada(self, jornada_id: int, jornada: Jornada):
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("UPDATE jornadas SET nombre = %s, hora_inicio = %s, hora_fin = %s WHERE id_jornada = %s", (jornada.nombre, jornada.hora_inicio, jornada.hora_fin, jornada_id))
+            conn.commit()
+            conn.close()
+            return {"resultado": "jornada actualizada"}
+        except psycopg2.Error as err:
+            print(err)
+            conn.rollback()
+            raise HTTPException(status_code=500, detail="Error al actualizar jornada")
+        finally:
+            conn.close()
+    
+    def delete_jornada(self, jornada_id: int):
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM jornadas WHERE id_jornada = %s", (jornada_id,))
+            conn.commit()
+            conn.close()
+            return {"resultado": "jornada eliminada"}
+        except psycopg2.Error as err:
+            print(err)
+            conn.rollback()
+            raise HTTPException(status_code=500, detail="Error al eliminar jornada")
+        finally:
+            conn.close()

@@ -85,3 +85,33 @@ class DocenteAsignaturaController:
             conn.rollback()
         finally:
             conn.close()
+    
+    def update_docente_asignatura(self, docente_asignatura_id: int, docenteAsignatura: DocenteAsignatura):
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("UPDATE docente_asignatura SET id_docente = %s, id_asignatura = %s WHERE id = %s", (docenteAsignatura.id_docente, docenteAsignatura.id_asignatura, docente_asignatura_id))
+            conn.commit()
+            conn.close()
+            return {"resultado": "docente asignatura actualizado"}
+        except psycopg2.Error as err:
+            print(err)
+            conn.rollback()
+            raise HTTPException(status_code=500, detail="Error al actualizar docente asignatura")
+        finally:
+            conn.close()
+    
+    def delete_docente_asignatura(self, docente_asignatura_id: int):
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM docente_asignatura WHERE id = %s", (docente_asignatura_id,))
+            conn.commit()
+            conn.close()
+            return {"resultado": "docente asignatura eliminado"}
+        except psycopg2.Error as err:
+            print(err)
+            conn.rollback()
+            raise HTTPException(status_code=500, detail="Error al eliminar docente asignatura")
+        finally:
+            conn.close()

@@ -27,3 +27,13 @@ async def get_grupo(grupo_id: int):
 async def get_grupos():
     rpta = nuevo_grupo.get_grupos()
     return rpta
+1
+@router.put("/update_grupo/{grupo_id}")
+async def update_grupo(grupo_id: int, grupo: Grupo):
+    rpta = nuevo_grupo.update_grupo(grupo_id, grupo)
+    return rpta
+
+@router.delete("/delete_grupo/{grupo_id}")
+async def delete_grupo(grupo_id: int):
+    rpta = nuevo_grupo.delete_grupo(grupo_id)
+    return rpta

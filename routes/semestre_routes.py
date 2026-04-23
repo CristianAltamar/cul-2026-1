@@ -26,3 +26,13 @@ async def get_periodo(periodo_id: int):
 async def get_periodos():
     rpta = nuevo_periodo.get_periodos()
     return rpta
+
+@router.put("/update_periodo/{periodo_id}")
+async def update_periodo(periodo_id: int, periodo: Periodo):
+    rpta = nuevo_periodo.update_periodo(periodo_id, periodo)
+    return rpta
+
+@router.delete("/delete_periodo/{periodo_id}")
+async def delete_periodo(periodo_id: int):
+    rpta = nuevo_periodo.delete_periodo(periodo_id)
+    return rpta

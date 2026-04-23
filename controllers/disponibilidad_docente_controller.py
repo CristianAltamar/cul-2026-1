@@ -254,3 +254,18 @@ class DisponibilidadDocenteController:
             raise HTTPException(status_code=500, detail="Error al obtener disponibilidad docentes")
         finally:
             conn.close()
+    
+    def delete_disponibilidad_docente(self, disponibilidad_id: int):
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM disponibilidad_docente WHERE id_disponibilidad = %s", (disponibilidad_id,))
+            conn.commit()
+            conn.close()
+            return {"resultado": "disponibilidad docente eliminada"}
+        except psycopg2.Error as err:
+            print(err)
+            conn.rollback()
+            raise HTTPException(status_code=500, detail="Error al eliminar disponibilidad docente")
+        finally:
+            conn.close()

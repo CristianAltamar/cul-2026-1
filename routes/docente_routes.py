@@ -26,3 +26,13 @@ async def get_docente(docente_id: int):
 async def get_docentes():
     rpta = nuevo_docente.get_docentes()
     return rpta
+
+@router.put("/update_docente/{docente_id}")
+async def update_docente(docente_id: int, docente: Docente):
+    rpta = nuevo_docente.update_docente(docente_id, docente)
+    return rpta
+
+@router.delete("/delete_docente/{docente_id}")
+async def delete_docente(docente_id: int):
+    rpta = nuevo_docente.delete_docente(docente_id)
+    return rpta

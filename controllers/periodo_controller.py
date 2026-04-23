@@ -86,3 +86,33 @@ class PeriodoController:
             raise HTTPException(status_code=500, detail="Error al obtener Periodoss")
         finally:
             conn.close()
+    
+    def update_periodo(self, periodo_id: int, periodo: Periodo):
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("UPDATE periodos SET nombre = %s, fecha_inicio = %s, fecha_fin = %s WHERE id_periodo = %s", (periodo.nombre, periodo.fecha_inicio, periodo.fecha_fin, periodo_id))
+            conn.commit()
+            conn.close()
+            return {"resultado": "periodo actualizado"}
+        except psycopg2.Error as err:
+            print(err)
+            conn.rollback()
+            raise HTTPException(status_code=500, detail="Error al actualizar periodo")
+        finally:
+            conn.close()
+    
+    def delete_periodo(self, periodo_id: int):
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM periodos WHERE id_periodo = %s", (periodo_id,))
+            conn.commit()
+            conn.close()
+            return {"resultado": "periodo eliminado"}
+        except psycopg2.Error as err:
+            print(err)
+            conn.rollback()
+            raise HTTPException(status_code=500, detail="Error al eliminar periodo")
+        finally:
+            conn.close()

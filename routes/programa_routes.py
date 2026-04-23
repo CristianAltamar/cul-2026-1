@@ -26,3 +26,13 @@ async def get_programa(programa_id: int):
 async def get_programas():
     rpta = nuevo_programa.get_programas()
     return rpta
+
+@router.put("/update_programa/{programa_id}")
+async def update_programa(programa_id: int, programa: Programa):
+    rpta = nuevo_programa.update_programa(programa_id, programa)
+    return rpta
+
+@router.delete("/delete_programa/{programa_id}")
+async def delete_programa(programa_id: int):
+    rpta = nuevo_programa.delete_programa(programa_id)
+    return rpta

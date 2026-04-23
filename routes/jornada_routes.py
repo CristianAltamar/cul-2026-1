@@ -26,3 +26,13 @@ async def get_jornada(jornada_id: int):
 async def get_jornadas():
     rpta = nuevo_jornada.get_jornadas()
     return rpta
+
+@router.put("/update_jornada/{jornada_id}")
+async def update_jornada(jornada_id: int, jornada: Jornada):
+    rpta = nuevo_jornada.update_jornada(jornada_id, jornada)
+    return rpta
+
+@router.delete("/delete_jornada/{jornada_id}")
+async def delete_jornada(jornada_id: int):
+    rpta = nuevo_jornada.delete_jornada(jornada_id)
+    return rpta

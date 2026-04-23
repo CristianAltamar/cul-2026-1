@@ -27,3 +27,13 @@ async def get_docenteAsignatura(disponibilidadDocente_id: int):
 async def get_docenteAsignaturas():
     rpta = nuevo_docenteAsignatura.get_docente_asignaturas()
     return rpta
+
+@router.put("/update_docenteAsignatura/{docente_asignatura_id}")
+async def update_docenteAsignatura(docente_asignatura_id: int, docenteAsignatura: DocenteAsignatura):
+    rpta = nuevo_docenteAsignatura.update_docente_asignatura(docente_asignatura_id, docenteAsignatura)
+    return rpta
+
+@router.delete("/delete_docenteAsignatura/{docente_asignatura_id}")
+async def delete_docenteAsignatura(docente_asignatura_id: int):
+    rpta = nuevo_docenteAsignatura.delete_docente_asignatura(docente_asignatura_id)
+    return rpta

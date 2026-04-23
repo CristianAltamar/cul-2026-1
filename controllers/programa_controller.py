@@ -28,7 +28,7 @@ class ProgramaController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT p.id_programa,p.nombre,p.codigo,p.id_facultad,f.nombre,p.estado FROM programas p JOIN facultades f ON p.id_facultad = f.id WHERE p.id_programa = %s", (programa_id,))
+            cursor.execute("SELECT p.id_programa,p.nombre,p.codigo,p.id_facultad,f.nombre,p.estado FROM programas p JOIN facultades f ON p.id_facultad = f.id WHERE p.id_programa = %s AND p.estado = true", (programa_id,))
             result = cursor.fetchone()
             
             if result:
@@ -62,7 +62,7 @@ class ProgramaController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT p.id_programa,p.nombre,p.codigo,p.id_facultad,f.nombre,p.estado FROM programas p JOIN facultades f ON p.id_facultad = f.id")
+            cursor.execute("SELECT p.id_programa,p.nombre,p.codigo,p.id_facultad,f.nombre,p.estado FROM programas p JOIN facultades f ON p.id_facultad = f.id WHERE p.estado = true")
             result = cursor.fetchall()
 
             if result:
@@ -88,5 +88,35 @@ class ProgramaController:
             print(err)
             conn.rollback()
             raise HTTPException(status_code=500, detail="Error al obtener programas")
+        finally:
+            conn.close()
+    
+    def update_programa(self, programa_id: int, programa: Programa):
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("UPDATE programas SET nombre = %s, codigo = %s, id_facultad = %s, estado = %s WHERE id_programa = %s", (programa.nombre, programa.codigo, programa.id_facultad, programa.estado, programa_id))
+            conn.commit()
+            conn.close()
+            return {"resultado": "programa actualizado"}
+        except psycopg2.Error as err:
+            print(err)
+            conn.rollback()
+            raise HTTPException(status_code=500, detail="Error al actualizar programa")
+        finally:
+            conn.close()
+    
+    def delete_programa(self, programa_id: int):
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("UPDATE programas SET estado = false WHERE id_programa = %s", (programa_id,))
+            conn.commit()
+            conn.close()
+            return {"resultado": "programa eliminado"}
+        except psycopg2.Error as err:
+            print(err)
+            conn.rollback()
+            raise HTTPException(status_code=500, detail="Error al eliminar programa")
         finally:
             conn.close()

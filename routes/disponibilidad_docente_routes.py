@@ -36,3 +36,8 @@ async def get_disponibilidad_docente(docente_id: int, periodo_id: int):
 async def get_disponibilidad_docentes():
     rpta = nuevo_disponibilidad_docente.get_disponibilidad_docentes()
     return rpta
+
+@router.delete("/delete_disponibilidad_docente/{disponibilidad_id}")
+async def delete_disponibilidad_docente(disponibilidad_id: int):
+    rpta = nuevo_disponibilidad_docente.delete_disponibilidad_docente(disponibilidad_id)
+    return rpta

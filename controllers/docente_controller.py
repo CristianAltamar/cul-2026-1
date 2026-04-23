@@ -32,7 +32,7 @@ class DocenteController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT d.id_docente, d.tipo_documento,d.numero_documento,d.primer_nombre,d.segundo_nombre,d.primer_apellido,d.segundo_apellido,d.telefono,d.email,d.id_rol, r.nombre, d.estado FROM docentes d join roles r on d.id_rol = r.id_rol WHERE d.id_docente = %s", (docente_id,))
+            cursor.execute("SELECT d.id_docente, d.tipo_documento,d.numero_documento,d.primer_nombre,d.segundo_nombre,d.primer_apellido,d.segundo_apellido,d.telefono,d.email,d.id_rol, r.nombre, d.estado FROM docentes d join roles r on d.id_rol = r.id_rol WHERE d.id_docente = %s AND d.estado = true", (docente_id,))
             result = cursor.fetchone()
 
             if result:
@@ -72,7 +72,7 @@ class DocenteController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT d.id_docente, d.tipo_documento,d.numero_documento,d.primer_nombre,d.segundo_nombre,d.primer_apellido,d.segundo_apellido,d.telefono,d.email,d.password_hash,d.id_rol, r.nombre, d.estado FROM docentes d join roles r on d.id_rol = r.id_rol WHERE d.email = %s", (email,))
+            cursor.execute("SELECT d.id_docente, d.tipo_documento,d.numero_documento,d.primer_nombre,d.segundo_nombre,d.primer_apellido,d.segundo_apellido,d.telefono,d.email,d.password_hash,d.id_rol, r.nombre, d.estado FROM docentes d join roles r on d.id_rol = r.id_rol WHERE d.email = %s AND d.estado = true", (email,))
             result = cursor.fetchone()
 
             if result:
@@ -113,7 +113,7 @@ class DocenteController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT d.id_docente, d.tipo_documento,d.numero_documento,d.primer_nombre,d.segundo_nombre,d.primer_apellido,d.segundo_apellido,d.telefono,d.email,d.id_rol, r.nombre, d.estado FROM docentes d join roles r on d.id_rol = r.id_rol")
+            cursor.execute("SELECT d.id_docente, d.tipo_documento,d.numero_documento,d.primer_nombre,d.segundo_nombre,d.primer_apellido,d.segundo_apellido,d.telefono,d.email,d.id_rol, r.nombre, d.estado FROM docentes d join roles r on d.id_rol = r.id_rol WHERE d.estado = true")
             result = cursor.fetchall()
 
             if result:
@@ -145,5 +145,35 @@ class DocenteController:
             print(err)
             conn.rollback()
             raise HTTPException(status_code=500, detail="Error al obtener docentes")
+        finally:
+            conn.close()
+    
+    def update_docente(self, docente_id: int, docente: Docente):
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("UPDATE docentes SET tipo_documento = %s, numero_documento = %s, primer_nombre = %s, segundo_nombre = %s, primer_apellido = %s, segundo_apellido = %s, telefono = %s, email = %s, id_rol = %s, estado = %s WHERE id_docente = %s", (docente.tipo_documento, docente.n_documento, docente.primer_nombre, docente.segundo_nombre, docente.primer_apellido, docente.segundo_apellido, docente.telefono, docente.email, docente.id_rol, docente.estado, docente_id))
+            conn.commit()
+            conn.close()
+            return {"resultado": "docente actualizado"}
+        except psycopg2.Error as err:
+            print(err)
+            conn.rollback()
+            raise HTTPException(status_code=500, detail="Error al actualizar docente")
+        finally:
+            conn.close()
+    
+    def delete_docente(self, docente_id: int):
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("UPDATE docentes SET estado = false WHERE id_docente = %s", (docente_id,))
+            conn.commit()
+            conn.close()
+            return {"resultado": "docente eliminado"}
+        except psycopg2.Error as err:
+            print(err)
+            conn.rollback()
+            raise HTTPException(status_code=500, detail="Error al eliminar docente")
         finally:
             conn.close()

@@ -83,3 +83,33 @@ class FacultadController:
             raise HTTPException(status_code=500, detail="Error al obtener facultades")
         finally:
             conn.close()
+    
+    def update_facultad(self, facultad_id: int, facultad: Facultad):
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("UPDATE facultades SET nombre = %s WHERE id = %s", (facultad.nombre, facultad_id))
+            conn.commit()
+            conn.close()
+            return {"resultado": "facultad actualizada"}
+        except psycopg2.Error as err:
+            print(err)
+            conn.rollback()
+            raise HTTPException(status_code=500, detail="Error al actualizar facultad")
+        finally:
+            conn.close()
+    
+    def delete_facultad(self, facultad_id: int):
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM facultades WHERE id = %s", (facultad_id,))
+            conn.commit()
+            conn.close()
+            return {"resultado": "facultad eliminada"}
+        except psycopg2.Error as err:
+            print(err)
+            conn.rollback()
+            raise HTTPException(status_code=500, detail="Error al eliminar facultad")
+        finally:
+            conn.close()

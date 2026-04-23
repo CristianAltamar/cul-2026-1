@@ -10,7 +10,7 @@ class AsignaturaController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO asignaturas (id_programa, nombre, codigo, horas_semanales, estado) VALUES (%s,%s,%s,%s,%s)", (asignatura.id_programa,asignatura.nombre,asignatura.codigo,asignatura.horas_semanales,asignatura.estado))
+            cursor.execute("INSERT INTO asignaturas (id_programa, nombre, estado) VALUES (%s,%s,%s)", (asignatura.id_programa,asignatura.nombre,asignatura.estado))
             conn.commit()
             conn.close()
             return {"resultado": "asignatura creado"}
@@ -28,7 +28,7 @@ class AsignaturaController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM asignaturas WHERE id_asignatura = %s", (asignatura_id,))
+            cursor.execute("SELECT * FROM asignaturas WHERE id_asignatura = %s AND estado = true", (asignatura_id,))
             result = cursor.fetchone()
 
             if result:
@@ -36,8 +36,6 @@ class AsignaturaController:
                         'id':int(result[0]),
                         'id_programa':int(result[1]),
                         'nombre':result[2],
-                        'codigo':result[3],
-                        'horas_semanales':int(result[4]),
                         'estado':bool(result[5])
                 }
                 
@@ -62,7 +60,7 @@ class AsignaturaController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM asignaturas")
+            cursor.execute("SELECT * FROM asignaturas WHERE estado = true")
             result = cursor.fetchall()
             if result:
                 payload = []
@@ -72,8 +70,6 @@ class AsignaturaController:
                         'id':data[0],
                         'id_programa':int(data[1]),
                         'nombre':data[2],
-                        'codigo':data[3],
-                        'horas_semanales':int(data[4]),
                         'estado':bool(data[5])
                     }
                     payload.append(content)
@@ -86,5 +82,35 @@ class AsignaturaController:
         except psycopg2.Error as err:
             print(err)
             conn.rollback()
+        finally:
+            conn.close()
+    
+    def update_asignatura(self, asignatura_id: int, asignatura: Asignatura):
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("UPDATE asignaturas SET id_programa = %s, nombre = %s, estado = %s WHERE id_asignatura = %s", (asignatura.id_programa, asignatura.nombre, asignatura.estado, asignatura_id))
+            conn.commit()
+            conn.close()
+            return {"resultado": "asignatura actualizada"}
+        except psycopg2.Error as err:
+            print(err)
+            conn.rollback()
+            raise HTTPException(status_code=500, detail="Error al actualizar asignatura")
+        finally:
+            conn.close()
+    
+    def delete_asignatura(self, asignatura_id: int):
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("UPDATE asignaturas SET estado = false WHERE id_asignatura = %s", (asignatura_id,))
+            conn.commit()
+            conn.close()
+            return {"resultado": "asignatura eliminada"}
+        except psycopg2.Error as err:
+            print(err)
+            conn.rollback()
+            raise HTTPException(status_code=500, detail="Error al eliminar asignatura")
         finally:
             conn.close()

@@ -27,3 +27,13 @@ async def get_asignatura(asignatura_id: int):
 async def get_asignaturas():
     rpta = nuevo_asignatura.get_asignaturas()
     return rpta
+
+@router.put("/update_asignatura/{asignatura_id}")
+async def update_asignatura(asignatura_id: int, asignatura: Asignatura):
+    rpta = nuevo_asignatura.update_asignatura(asignatura_id, asignatura)
+    return rpta
+
+@router.delete("/delete_asignatura/{asignatura_id}")
+async def delete_asignatura(asignatura_id: int):
+    rpta = nuevo_asignatura.delete_asignatura(asignatura_id)
+    return rpta

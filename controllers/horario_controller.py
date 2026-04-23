@@ -10,7 +10,7 @@ class HorarioController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO horarios (id_grupo, id_docente, id_jornada, dia_semana, hora_inicio, hora_fin) VALUES (%s, %s, %s, %s, %s, %s, %s)", (horario.id_grupo, horario.id_docente, horario.id_jornada, horario.dia_semana, horario.hora_inicio, horario.hora_fin))
+            cursor.execute("INSERT INTO horarios (id_grupo, id_docente, id_jornada, dia_semana, hora_inicio, hora_fin, id_asignatura) VALUES (%s, %s, %s, %s, %s, %s, %s)", (horario.id_grupo, horario.id_docente, horario.id_jornada, horario.dia_semana, horario.hora_inicio, horario.hora_fin, horario.id_asignatura))
             conn.commit()
             conn.close()
             return {"resultado": "horario creado"}
@@ -28,7 +28,7 @@ class HorarioController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT h.id_horario, h.id_grupo, g.codigo_grupo, h.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido, h.id_jornada , j.nombre, h.dia_semana, h.hora_inicio, h.hora_fin FROM horarios h join grupos g on h.id_grupo = g.id_grupo join docentes d on h.id_docente = d.id_docente join jornadas j on h.id_jornada = j.id_jornada WHERE h.id_horario = %s", (horario_id,))
+            cursor.execute("SELECT h.id_horario, h.id_grupo, g.codigo_grupo, h.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido,  h.id_asignatura, a.nombre, h.id_jornada , j.nombre, h.dia_semana, h.hora_inicio, h.hora_fin FROM horarios h join grupos g on h.id_grupo = g.id_grupo join docentes d on h.id_docente = d.id_docente join asignaturas a on h.id_asignatura = a.id_asignatura join jornadas j on h.id_jornada = j.id_jornada WHERE h.id_horario = %s", (horario_id,))
             result = cursor.fetchone()
             
             if result:
@@ -38,11 +38,13 @@ class HorarioController:
                         'codigo_grupo':result[2],
                         'id_docente':int(result[3]),
                         'docente':f"{result[4]} {result[5] if result[5] else ''} {result[6]} {result[7] if result[7] else ''}".strip(),
-                        'id_jornada':int(result[10]),
-                        'jornada':result[11],
-                        'dia_semana':result[12],
-                        'hora_inicio':result[13],
-                        'hora_fin':result[14]
+                        'id_asignatura':int(result[10]),
+                        'asignatura':result[11],
+                        'id_jornada':int(result[12]),
+                        'jornada':result[13],
+                        'dia_semana':result[14],
+                        'hora_inicio':result[15],
+                        'hora_fin':result[16]
                 }
                 
                 json_data = jsonable_encoder(content)            
@@ -62,11 +64,11 @@ class HorarioController:
         finally:
             conn.close()
 
-    def get_horario_docente(self, docente_id: int):
+    def get_horario_docente(self, id_periodo: int, id_jornada: int, docente_id: int):
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT h.id_horario, h.id_grupo, g.codigo_grupo, h.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido, h.id_jornada , j.nombre, h.dia_semana, h.hora_inicio, h.hora_fin FROM horarios h join grupos g on h.id_grupo = g.id_grupo join docentes d on h.id_docente = d.id_docente join jornadas j on h.id_jornada = j.id_jornada WHERE h.id_docente = %s", (docente_id,))
+            cursor.execute("SELECT h.id_horario, h.id_grupo, g.codigo_grupo, h.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido,  h.id_asignatura, a.nombre, h.id_jornada , j.nombre, h.dia_semana, h.hora_inicio, h.hora_fin FROM horarios h join grupos g on h.id_grupo = g.id_grupo join docentes d on h.id_docente = d.id_docente join asignaturas a on h.id_asignatura = a.id_asignatura join jornadas j on h.id_jornada = j.id_jornada WHERE h.id_periodo = %s AND h.id_jornada = %s AND h.id_docente = %s", (id_periodo, id_jornada, docente_id))
             result = cursor.fetchall()
 
             if result:
@@ -79,11 +81,13 @@ class HorarioController:
                             'codigo_grupo':data[2],
                             'id_docente':int(data[3]),
                             'docente':f"{data[4]} {data[5] if data[5] else ''} {data[6]} {data[7] if data[7] else ''}".strip(),
-                            'id_jornada':int(data[10]),
-                            'jornada':data[11],
-                            'dia_semana':data[12],
-                            'hora_inicio':data[13],
-                            'hora_fin':data[14]
+                            'id_asignatura':int(data[10]),
+                            'asignatura':data[11],
+                            'id_jornada':int(data[12]),
+                            'jornada':data[13],
+                            'dia_semana':data[14],
+                            'hora_inicio':data[15],
+                            'hora_fin':data[16]
                         }
                     payload.append(content)
                 json_data = jsonable_encoder(payload)            
@@ -103,11 +107,11 @@ class HorarioController:
         finally:
             conn.close()
     
-    def get_horarios(self):
+    def get_horario_programa(self, id_periodo: int, id_jornada: int, id_programa: int):
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT h.id_horario, h.id_grupo, g.codigo_grupo, h.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido, h.id_jornada , j.nombre, h.dia_semana, h.hora_inicio, h.hora_fin FROM horarios h join grupos g on h.id_grupo = g.id_grupo join docentes d on h.id_docente = d.id_docente join jornadas j on h.id_jornada = j.id_jornada")
+            cursor.execute("SELECT h.id_horario, h.id_grupo, g.codigo_grupo, h.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido,  h.id_asignatura, a.nombre, h.id_jornada , j.nombre, h.dia_semana, h.hora_inicio, h.hora_fin FROM horarios h join grupos g on h.id_grupo = g.id_grupo join docentes d on h.id_docente = d.id_docente join asignaturas a on h.id_asignatura = a.id_asignatura join programas p on a.id_programa = p.id_programa join jornadas j on h.id_jornada = j.id_jornada  WHERE h.id_periodo = %s AND h.id_jornada = %s AND a.id_programa = %s", (id_periodo, id_jornada, id_programa))
             result = cursor.fetchall()
 
             if result:
@@ -120,6 +124,8 @@ class HorarioController:
                         'codigo_grupo':data[2],
                         'id_docente':data[3],
                         'docente':f"{data[4]} {data[5] if data[5] else ''} {data[6]} {data[7] if data[7] else ''}".strip(),
+                        'id_asignatura':data[8],
+                        'asignatura':data[9],
                         'id_jornada':data[10],
                         'jornada':data[11],
                         'dia_semana':data[12],
@@ -137,5 +143,35 @@ class HorarioController:
             print(err)
             conn.rollback()
             raise HTTPException(status_code=500, detail="Error al obtener horarios")
+        finally:
+            conn.close()
+    
+    def update_horario(self, horario_id: int, horario: Horario):
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("UPDATE horarios SET id_grupo = %s, id_docente = %s, id_jornada = %s, dia_semana = %s, hora_inicio = %s, hora_fin = %s, id_asignatura = %s WHERE id_horario = %s", (horario.id_grupo, horario.id_docente, horario.id_jornada, horario.dia_semana, horario.hora_inicio, horario.hora_fin, horario.id_asignatura, horario_id))
+            conn.commit()
+            conn.close()
+            return {"resultado": "horario actualizado"}
+        except psycopg2.Error as err:
+            print(err)
+            conn.rollback()
+            raise HTTPException(status_code=500, detail="Error al actualizar horario")
+        finally:
+            conn.close()
+    
+    def delete_horario(self, horario_id: int):
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM horarios WHERE id_horario = %s", (horario_id,))
+            conn.commit()
+            conn.close()
+            return {"resultado": "horario eliminado"}
+        except psycopg2.Error as err:
+            print(err)
+            conn.rollback()
+            raise HTTPException(status_code=500, detail="Error al eliminar horario")
         finally:
             conn.close()
