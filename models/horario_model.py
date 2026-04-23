@@ -11,5 +11,10 @@ class Horario(BaseModel):
     dia_semana:int
     hora_inicio:str
     hora_fin:str
+<<<<<<< HEAD
     id_asignatura:int
     asignatura:str|None = None
+=======
+    id_periodo:int
+    periodo:str|None = None
+>>>>>>> 9c9527b95fd314a3cea47194b2fff27143d59007

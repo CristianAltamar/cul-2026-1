@@ -254,6 +254,7 @@ class DisponibilidadDocenteController:
             raise HTTPException(status_code=500, detail="Error al obtener disponibilidad docentes")
         finally:
             conn.close()
+<<<<<<< HEAD
     
     def delete_disponibilidad_docente(self, disponibilidad_id: int):
         try:
@@ -267,5 +268,21 @@ class DisponibilidadDocenteController:
             print(err)
             conn.rollback()
             raise HTTPException(status_code=500, detail="Error al eliminar disponibilidad docente")
+=======
+
+    def check_horario_in_disponibilidad(self, docente_id: int, periodo_id: int, dia_semana: int, hora_inicio: str, hora_fin: str):
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT COUNT(*) FROM disponibilidad_docente WHERE id_docente = %s AND id_periodo = %s AND dia_semana = %s AND hora_inicio <= %s AND hora_fin >= %s",
+                (docente_id, periodo_id, dia_semana, hora_inicio, hora_fin)
+            )
+            result = cursor.fetchone()
+            return result[0] > 0
+        except psycopg2.Error as err:
+            print(err)
+            raise HTTPException(status_code=500, detail="Error al verificar horario en disponibilidad")
+>>>>>>> 9c9527b95fd314a3cea47194b2fff27143d59007
         finally:
             conn.close()
