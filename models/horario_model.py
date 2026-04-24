@@ -13,3 +13,5 @@ class Horario(BaseModel):
     asignatura:str|None = None
     id_periodo:int
     periodo:str|None = None
+    id_jornada:int
+    jornada:str|None = None
