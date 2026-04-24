@@ -28,15 +28,16 @@ class AsignaturaController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM asignaturas WHERE id_asignatura = %s AND estado = true", (asignatura_id,))
+            cursor.execute("SELECT a.id_asignatura, a.id_programa, p.nombre, a.nombre, a.estado FROM asignaturas a JOIN programas p ON a.id_programa = p.id_programa WHERE a.id_asignatura = %s AND a.estado = true", (asignatura_id,))
             result = cursor.fetchone()
 
             if result:
                 content={
                         'id':int(result[0]),
                         'id_programa':int(result[1]),
-                        'nombre':result[2],
-                        'estado':bool(result[5])
+                        'programa':result[2],
+                        'nombre':result[3],
+                        'estado':bool(result[4])
                 }
                 
                 json_data = jsonable_encoder(content)            
@@ -56,11 +57,19 @@ class AsignaturaController:
         finally:
             conn.close()
     
-    def get_asignaturas(self):
+    def get_asignaturas(self, programa_id: int | None = None):
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM asignaturas WHERE estado = true")
+            if programa_id is not None:
+                cursor.execute(
+                    "SELECT a.id_asignatura, a.id_programa, p.nombre, a.nombre, a.estado FROM asignaturas a JOIN programas p ON a.id_programa = p.id_programa WHERE a.estado = true AND a.id_programa = %s",
+                    (programa_id,)
+                )
+            else:
+                cursor.execute(
+                    "SELECT a.id_asignatura, a.id_programa, p.nombre, a.nombre, a.estado FROM asignaturas a JOIN programas p ON a.id_programa = p.id_programa WHERE a.estado = true"
+                )
             result = cursor.fetchall()
             if result:
                 payload = []
@@ -69,19 +78,20 @@ class AsignaturaController:
                     content={
                         'id':data[0],
                         'id_programa':int(data[1]),
-                        'nombre':data[2],
-                        'estado':bool(data[5])
+                        'programa':data[2],
+                        'nombre':data[3],
+                        'estado':bool(data[4])
                     }
                     payload.append(content)
                     content = {}
-                json_data = jsonable_encoder(payload)        
+                json_data = jsonable_encoder(payload)
                 return {"resultado": json_data}
             else:
-                raise HTTPException(status_code=404, detail="asignatura not found")  
-                
+                return {"resultado": []}
         except psycopg2.Error as err:
             print(err)
             conn.rollback()
+            raise HTTPException(status_code=500, detail="Error al obtener asignaturas")
         finally:
             conn.close()
     

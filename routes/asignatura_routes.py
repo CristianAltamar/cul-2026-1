@@ -24,8 +24,8 @@ async def get_asignatura(asignatura_id: int):
     return rpta
 
 @router.get("/get_asignaturas/")
-async def get_asignaturas():
-    rpta = nuevo_asignatura.get_asignaturas()
+async def get_asignaturas(programa_id: int | None = None):
+    rpta = nuevo_asignatura.get_asignaturas(programa_id)
     return rpta
 
 @router.put("/update_asignatura/{asignatura_id}")
