@@ -128,13 +128,54 @@ class HorarioController:
                         'docente':f"{data[4]} {data[5] if data[5] else ''} {data[6]} {data[7] if data[7] else ''}".strip(),
                         'id_asignatura':data[8],
                         'asignatura':data[9],
-                        'dia_semana':data[12],
-                        'hora_inicio':data[13],
-                        'hora_fin':data[14],
-                        'id_jornada':int(data[15]),
-                        'jornada':data[16],
-                        'id_periodo': int(data[17]),
-                        'periodo': data[18]
+                        'dia_semana':data[10],
+                        'hora_inicio':data[11],
+                        'hora_fin':data[12],
+                        'id_jornada':int(data[13]),
+                        'jornada':data[14],
+                        'id_periodo': int(data[15]),
+                        'periodo': data[16]
+                    }
+                    payload.append(content)
+                    content = {}
+                json_data = jsonable_encoder(payload)        
+                return {"resultado": json_data}
+            else:
+                raise HTTPException(status_code=404, detail="horario not found")  
+                
+        except psycopg2.Error as err:
+            print(err)
+            conn.rollback()
+            raise HTTPException(status_code=500, detail="Error al obtener horarios")
+        finally:
+            conn.close()
+
+    def get_horarios(self):
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("SELECT h.id_horario, h.id_grupo, g.codigo_grupo, h.id_docente, d.primer_nombre, d.segundo_nombre, d.primer_apellido, d.segundo_apellido,  h.id_asignatura, a.nombre, h.dia_semana, h.hora_inicio, h.hora_fin, h.id_jornada, j.nombre, h.id_periodo, p.nombre FROM horarios h join grupos g on h.id_grupo = g.id_grupo join docentes d on h.id_docente = d.id_docente join asignaturas a on h.id_asignatura = a.id_asignatura join jornadas j on h.id_jornada = j.id_jornada join periodos p on h.id_periodo = p.id_periodo")
+            result = cursor.fetchall()
+
+            if result:
+                payload = []
+                content = {} 
+                for data in result:
+                    content={
+                        'id':data[0],
+                        'id_grupo':data[1],
+                        'codigo_grupo':data[2],
+                        'id_docente':data[3],
+                        'docente':f"{data[4]} {data[5] if data[5] else ''} {data[6]} {data[7] if data[7] else ''}".strip(),
+                        'id_asignatura':data[8],
+                        'asignatura':data[9],
+                        'dia_semana':data[10],
+                        'hora_inicio':data[11],
+                        'hora_fin':data[12],
+                        'id_jornada':int(data[13]),
+                        'jornada':data[14],
+                        'id_periodo': int(data[15]),
+                        'periodo': data[16]
                     }
                     payload.append(content)
                     content = {}
